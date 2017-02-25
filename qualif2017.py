@@ -1,17 +1,18 @@
 #   Hashcode 2017 qualification round youtube streaming problem solution by Team.
 #   This is a better version of our uploaded solution.
+#   NOT deterministic results!
 #
-#   kittens Score:                          484002
-#   me_at_the_zoo Score:                    366347
-#   trending_today Score:                   335888
+#   kittens Score:                          495538
+#   me_at_the_zoo Score:                    484699
+#   trending_today Score:                   335960
 #   videos_worth_spreading Score:           462598
-#   Total Score:                            1679294
+#   Total Score:                           1778795
 #
 #   Team members:
 #       Giorgos Stamatakis
 #       Christos Spyridakis
 #       Tzanis Fotakis
-#
+
 
 import sys
 import Queue as queue
@@ -124,30 +125,29 @@ class Data(object):
                     fout.write('%d ' % self.caches[i].videoIDs[j])
                 fout.write('\n')
 
-    def process_request(self, req):
-        endpointCaches = self.endpoints[req.re].cachesID
-        endpointLatencies = self.endpoints[req.re].cachesLatency
+    def process_request(self, req, deg=-1, cacheResult=-1, turns=1):
+        ###Increase the number of rounds for a better score (possibly).
+        for _ in range(0, turns):
+            cacheResult = -1
+            if len(self.endpoints[req.re].cachesID) == 0:
+                return
 
-        if len(endpointCaches) == 0:
-            return
-
-        vidSize = self.videos[req.rv]
-        cacheResult = -1
-
-        for i in range(len(endpointCaches)):
-            if self.caches[endpointCaches[i]].capacity - vidSize > 0:
-                cacheResult = i
-                break
-
-        if cacheResult == -1:
-            self.notServed += 1
-            return
-
-        for i in range(cacheResult, len(endpointCaches)):
-            if self.caches[endpointCaches[i]].capacity - vidSize > 0:
-                if endpointCaches[cacheResult] - endpointLatencies[i] > 0:
+            for i in range(len(self.endpoints[req.re].cachesID)):
+                if self.caches[self.endpoints[req.re].cachesID[i]].capacity - self.videos[req.rv] > 0:
                     cacheResult = i
-        self.caches[endpointCaches[cacheResult]].addVideo(req.rv, vidSize)
+                    break
+
+            if cacheResult == -1:
+                self.notServed += 1
+                return
+
+            for i in range(cacheResult, len(self.endpoints[req.re].cachesID)):
+                if self.caches[self.endpoints[req.re].cachesID[i]].capacity - self.videos[req.rv] > 0:
+                    diff = self.endpoints[req.re].cachesID[cacheResult] - self.endpoints[req.re].cachesLatency[i]
+                    if diff > 0 and diff > deg:
+                        deg = self.endpoints[req.re].cachesID[cacheResult] - self.endpoints[req.re].cachesLatency[i]
+                        cacheResult = i
+        self.caches[self.endpoints[req.re].cachesID[cacheResult]].addVideo(req.rv, self.videos[req.rv])
 
     def compute(self):
         rs = []
@@ -188,6 +188,7 @@ def main():
         _data.compute()
         _data.write_file()
     except KeyboardInterrupt:
+        print "Salvage successful!"
         pass
 
 
