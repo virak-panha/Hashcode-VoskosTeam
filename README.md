@@ -1,4 +1,4 @@
-   Hashcode 2017 qualification round youtube streaming problem solution by Team.
+   Hashcode 2017 qualification round youtube streaming problem solution by Team V4Vosk.
    This is a better version of our uploaded solution.
 
    kittens Score:                          484002
