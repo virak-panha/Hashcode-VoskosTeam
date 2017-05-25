@@ -1,13 +1,14 @@
-   Hashcode 2017 qualification round youtube streaming problem solution by Team V4Voskoi.
-   This is a better version of our uploaded solution.
+# Hashcode 2017 - Qualification Round
+#### Youtube streaming servers problem solution by Team V4Voskoi.
+##### Team members:
+* [Giorgos Stamatakis](https://github.com/gstamatakis)
+* [Christos Spyridakis](https://github.com/ChSpyman)
+* [Tzanis Fotakis](https://github.com/TFotakis)
 
-   kittens Score:                          484002
-   me_at_the_zoo Score:                    366347
-   trending_today Score:                   335888
-   videos_worth_spreading Score:           462598
-   Total Score:                            1679294
-
-   Team members:
-       Giorgos Stamatakis
-       Christos Spyridakis
-       Tzanis Fotakis
+This is a better version of our uploaded solution.
+##### Scores
+* kittens: 484002
+* me_at_the_zoo: 366347
+* trending_today: 335888
+* videos_worth_spreading: 462598
+##### Total Score: 1679294
