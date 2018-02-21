@@ -1,6 +1,5 @@
-#   Hashcode 2017 qualification round youtube streaming problem solution by Team: V4Voskoi.
+#   Hashcode 2017 qualification round youtube streaming problem solution by Team: Voskoi.
 #   This is a better version of our uploaded solution.
-#   NOT deterministic results!
 #
 #   kittens Score:                          495538
 #   me_at_the_zoo Score:                    484699
@@ -12,12 +11,11 @@
 #       Giorgos Stamatakis
 #       Christos Spyridakis
 #       Tzanis Fotakis
-
-
+import queue
 import sys
-import Queue as queue
+from functools import total_ordering
 
-import null as null
+import null
 
 
 class Cache(object):
@@ -38,6 +36,7 @@ class Endpoint(object):
         self.cachesLatency = cachesLatency
 
 
+@total_ordering  # Comparator interface
 class Request(object):
     def __init__(self, Rv, Re, Rn, gain=-1):
         self.rv = Rv
@@ -45,10 +44,10 @@ class Request(object):
         self.rn = Rn
         self.gain = gain
 
-    def compareTo(self, req):
-        if self.gain < req.gain:
+    def __lt__(self, other):
+        if self.gain < other.gain:
             return 1
-        elif self.gain == req.gain:
+        elif self.gain == other.gain:
             return 0
         else:
             return -1
@@ -175,7 +174,7 @@ class Data(object):
             rs[i] = null
 
 
-def main():
+if __name__ == '__main__':
     if len(sys.argv) < 3:
         sys.exit('Syntax: %s <filename> <output>' % sys.argv[0])
 
@@ -188,10 +187,5 @@ def main():
         _data.compute()
         _data.write_file()
     except KeyboardInterrupt:
-        print "Salvage successful!"
+        print("Salvage successful!")
         pass
-
-
-if __name__ == '__main__':
-    main()
-
