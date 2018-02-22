@@ -25,12 +25,11 @@ class Pizza:
                0 <= R[1] < self.R and 0 <= C[1] < self.C
 
     def checkH(self, R, C):  # Prevent the slice to include cells of other slices.
-        legal = False
         if self.checkInside(R, C):
             curSlice = self.pizza[R[0]:R[1] + 1, C[0]:C[1] + 1]
             if curSlice.size <= self.H and not math.isnan(curSlice.sum()):
-                legal = True
-        return legal
+                return True
+        return False
 
     def checkL(self, R, C):
         cur_slice = self.pizza[R[0]:(R[1] + 1), C[0]:(C[1] + 1)]  # slice of pizza
@@ -38,8 +37,7 @@ class Pizza:
         mushrooms = np.size(cur_slice) - tomatoes
         return tomatoes >= self.L and mushrooms >= self.L
 
-    @staticmethod
-    def bigger_slice(R, C, direction):  # (R)ight,(L)eft,(D)own,(U)p
+    def bigger_slice(self, R, C, direction):  # (R)ight,(L)eft,(D)own,(U)p
         global nextDir
         advanceRow = list(R)
         advanceCol = list(C)
