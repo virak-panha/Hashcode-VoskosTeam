@@ -100,7 +100,7 @@ if __name__ == '__main__':
     OutputFolder = ''
 
     if len(sys.argv) < 3:
-        InputFolder = 'input'  # Reads all the files inside this folder
+        InputFolder = 'inputPizza'  # Reads all the files inside this folder
         OutputFolder = 'output'  # Same names as input
     else:
         InputFolder = sys.argv[1]
