@@ -51,8 +51,8 @@ def how_much_can_we_improve(_video):
 
     best_cache = sorted(saved_time.items(), key=lambda x: x[1], reverse=True)[0]
 
-    # (time saved, cache, video)
     BEST_CACHE_CACHE[_video_index] = best_cache
+    # (time saved, cache, video)
     return best_cache[1], best_cache[0], _video
 
 
@@ -76,42 +76,45 @@ if __name__ == '__main__':
         print('Processing: ' + video_file_name)
         with open(video_path, 'r') as file:
             line = file.readline()
-            [V, E, R, C, X] = [int(n) for n in line.split()]
+            [Videos, Endpoints, Requests, Caches, CacheSize] = [int(n) for n in line.split()]  # Cardinalities
             line = file.readline()
             VIDEOS = [int(n) for n in line.split()]
             ENDPOINTS = []
             REQUESTS = []
             CACHES = defaultdict(lambda: set())
-            CACHE_CAPACITY = defaultdict(lambda: X)
+            CACHE_CAPACITY = defaultdict(lambda: CacheSize)
             BEST_CACHE_CACHE = defaultdict(lambda: None)
 
-            for _ in range(E):
+            for _ in range(Endpoints):  # Read info for each Endpoint
                 line = file.readline()
-                [ld, k] = [int(n) for n in line.split()]
-                e = (ld, dict())
+                [datacenterLatency, numOfConCaches] = [int(n) for n in line.split()]
+                curEndpoint = (datacenterLatency, dict())  # curEndpoint[0] = datacenterLatency
 
-                for _ in range(k):
+                for _ in range(numOfConCaches):  # Read info for each cache and its latency
                     line = file.readline()
-                    [c, lc] = [int(n) for n in line.split()]
-                    e[1][c] = lc
+                    [cur_cache, cur_cache_latency] = [int(n) for n in line.split()]
+                    # Save on each Endpoint every available cache and its latency
+                    curEndpoint[1][cur_cache] = cur_cache_latency
 
-                ENDPOINTS.append(e)
+                ENDPOINTS.append(curEndpoint)  # Save every Endpoint in random order (read order)
 
-            for _ in range(R):
+            for _ in range(Requests):  # For each request save tuple (video endpoint requests)
                 line = file.readline()
                 REQUESTS.append(tuple([int(n) for n in line.split()]))
 
+            # lambda sets the default value for every new item inserted in the dict. Avoids for-loop for init.
             vids = defaultdict(lambda: [0, []])
-            for r in tqdm(REQUESTS, desc='Requests'):
-                vids[r[0]][0] += request_cost(r)
-                vids[r[0]][1].append(r)
+            for req in tqdm(REQUESTS, desc='Requests'):  # tuples: (video endpoint requests)
+                vids[req[0]][0] += request_cost(req)  # vids[video][0] += cost
+                vids[req[0]][1].append(req)  # vids[video][1].append(req)
 
             pbar = tqdm(total=len(vids))
             pbar.set_description('Videos')
             while vids:
-                # Good for data 2 only lambda x: x[0]
-                time_saved, cache, video = max(map(how_much_can_we_improve, list(vids.items())),
-                                               key=lambda x: VIDEOS[x[2][0]])
+                # A list of the results of applying the function to the items of the argument sequence
+                vid_list = map(how_much_can_we_improve, list(vids.items()))  # (time saved, cache, video)
+                # Max finds
+                time_saved, cache, video = max(vid_list, key=lambda x: VIDEOS[x[2][0]])
                 if cache is None:
                     continue
 
