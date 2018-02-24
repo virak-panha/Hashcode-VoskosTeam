@@ -21,7 +21,7 @@ def request_cost(r):
 
 
 def how_much_can_we_improve(_video):
-    _video_index = _video[0]
+    _video_index = _video[0]  # Get info for the selected video
     _video_size = VIDEOS[_video_index]
 
     if BEST_CACHE_CACHE[_video_index] is not None:
@@ -32,25 +32,29 @@ def how_much_can_we_improve(_video):
     requests = _video[1][1]
 
     saved_time = defaultdict(lambda: 0)
-    for r in requests:
-        caches = ENDPOINTS[r[1]][1]
-        latency = ENDPOINTS[r[1]][0]
+    for r in requests:  # REQUESTS: (video,endpoint,requests) , ENDPOINTS: datacenterLatency,{cache:cache_latency}
+        caches = ENDPOINTS[r[1]][1]  # Available caches for this request
+        latency = ENDPOINTS[r[1]][0]  # Datacenter latency
+        # The current latency of this video
         current_cost = min([c[1] for c in caches.items() if _video[0] in CACHES[c[0]]] + [latency])
 
-        for _cache in caches.items():
-            space_left = CACHE_CAPACITY[_cache[0]]
+        # For all the available caches in this endpoint for this video
+        for _cache in caches.items():  # caches.items(): (id,latency)
+            space_left = CACHE_CAPACITY[_cache[0]]  # Remaining MBs in cache
+            if _video_size < space_left:  # If this video can fit into this cache
+                if current_cost > _cache[1]:  # If we can get lower latency
+                    # Add to saved time the latency difference multiplied by the amount of requests
+                    saved_time[_cache[0]] += (current_cost - _cache[1]) * r[2]  # r[2] : Number of requests for this vid
 
-            if _video_size < space_left:
-                if current_cost - _cache[1] > 0:
-                    saved_time[_cache[0]] += (current_cost - _cache[1]) * r[2]
-
-    if not saved_time:
-        del vids[_video[0]]
+    if not saved_time:  # When we can`t reduce latency anymore, optimal solution
+        del vids[_video[0]]  # Delete video
         pbar.update(1)
         return 0, None, _video
 
+    # Pick the cache with the most time saved.
     best_cache = sorted(saved_time.items(), key=lambda x: x[1], reverse=True)[0]
 
+    # Save the best cache for this video
     BEST_CACHE_CACHE[_video_index] = best_cache
     # (time saved, cache, video)
     return best_cache[1], best_cache[0], _video
