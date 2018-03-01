@@ -5,38 +5,38 @@ from collections import defaultdict
 from tqdm import tqdm
 
 
-def video_endpoint_cost(_video, endpoint):
-    if endpoint[1]:
-        for (_cache, latency) in endpoint[1].items():
-            if _video in CACHES[_cache]:
+def video_endpoint_cost(videoID, endpoint):
+    if endpoint[1]:  # If there are caches for this endpoint
+        for (cacheID, latency) in endpoint[1].items():
+            if videoID in CACHES[cacheID]:  # If video is in a cache
                 return latency
         else:
-            return endpoint[0]
-    else:
+            return endpoint[0]  # Datacenter latency
+    else:  # No caches available means that there is no reason to care about this endpoint
         return 0
 
 
-def request_cost(r):
-    return video_endpoint_cost(r[0], ENDPOINTS[r[1]]) * r[2]
+def request_cost(req):  # tuples: (video, endpoint, amount of requests)
+    return video_endpoint_cost(req[0], ENDPOINTS[req[1]]) * req[2]
 
 
-def how_much_can_we_improve(_video):
-    _video_index = _video[0]  # Get info for the selected video
+def how_much_can_we_improve(video):
+    _video_index = video[0]  # Get info for the selected video
     _video_size = VIDEOS[_video_index]
 
     if BEST_CACHE_CACHE[_video_index] is not None:
         best_cache = BEST_CACHE_CACHE[_video_index]
         if _video_size <= CACHE_CAPACITY[best_cache[0]]:
-            return best_cache[1], best_cache[0], _video
+            return best_cache[1], best_cache[0], video
 
-    requests = _video[1][1]
+    requests = video[1][1]
 
     saved_time = defaultdict(lambda: 0)
     for r in requests:  # REQUESTS: (video,endpoint,requests) , ENDPOINTS: datacenterLatency,{cache:cache_latency}
         caches = ENDPOINTS[r[1]][1]  # Available caches for this request
         latency = ENDPOINTS[r[1]][0]  # Datacenter latency
         # The current latency of this video
-        current_cost = min([c[1] for c in caches.items() if _video[0] in CACHES[c[0]]] + [latency])
+        current_cost = min([c[1] for c in caches.items() if video[0] in CACHES[c[0]]] + [latency])
 
         # For all the available caches in this endpoint for this video
         for _cache in caches.items():  # caches.items(): (id,latency)
@@ -47,9 +47,9 @@ def how_much_can_we_improve(_video):
                     saved_time[_cache[0]] += (current_cost - _cache[1]) * r[2]  # r[2] : Number of requests for this vid
 
     if not saved_time:  # When we can`t reduce latency anymore, optimal solution
-        del vids[_video[0]]  # Delete video
+        del vids[video[0]]  # Delete video
         pbar.update(1)
-        return 0, None, _video
+        return 0, None, video
 
     # Pick the cache with the most time saved.
     best_cache = sorted(saved_time.items(), key=lambda x: x[1], reverse=True)[0]
@@ -57,7 +57,7 @@ def how_much_can_we_improve(_video):
     # Save the best cache for this video
     BEST_CACHE_CACHE[_video_index] = best_cache
     # (time saved, cache, video)
-    return best_cache[1], best_cache[0], _video
+    return best_cache[1], best_cache[0], video
 
 
 if __name__ == '__main__':
@@ -79,10 +79,8 @@ if __name__ == '__main__':
         video_path = os.path.join(InputFolder, video_file_name)
         print('Processing: ' + video_file_name)
         with open(video_path, 'r') as file:
-            line = file.readline()
-            [Videos, Endpoints, Requests, Caches, CacheSize] = [int(n) for n in line.split()]  # Cardinalities
-            line = file.readline()
-            VIDEOS = [int(n) for n in line.split()]
+            [Videos, Endpoints, Requests, Caches, CacheSize] = [int(n) for n in file.readline().split()]
+            VIDEOS = [int(n) for n in file.readline().split()]
             ENDPOINTS = []
             REQUESTS = []
             CACHES = defaultdict(lambda: set())
@@ -90,21 +88,18 @@ if __name__ == '__main__':
             BEST_CACHE_CACHE = defaultdict(lambda: None)
 
             for _ in range(Endpoints):  # Read info for each Endpoint
-                line = file.readline()
-                [datacenterLatency, numOfConCaches] = [int(n) for n in line.split()]
+                [datacenterLatency, numOfConCaches] = [int(n) for n in file.readline().split()]
                 curEndpoint = (datacenterLatency, dict())  # curEndpoint[0] = datacenterLatency
 
                 for _ in range(numOfConCaches):  # Read info for each cache and its latency
-                    line = file.readline()
-                    [cur_cache, cur_cache_latency] = [int(n) for n in line.split()]
+                    [cur_cache, cur_cache_latency] = [int(n) for n in file.readline().split()]
                     # Save on each Endpoint every available cache and its latency
                     curEndpoint[1][cur_cache] = cur_cache_latency
 
                 ENDPOINTS.append(curEndpoint)  # Save every Endpoint in random order (read order)
 
             for _ in range(Requests):  # For each request save tuple (video endpoint requests)
-                line = file.readline()
-                REQUESTS.append(tuple([int(n) for n in line.split()]))
+                REQUESTS.append(tuple([int(n) for n in file.readline().split()]))
 
             # lambda sets the default value for every new item inserted in the dict. Avoids for-loop for init.
             vids = defaultdict(lambda: [0, []])
@@ -141,4 +136,4 @@ if __name__ == '__main__':
                     if videos:
                         out_file.write('{0} {1}\n'.format(cache, " ".join(map(str, list(videos)))))
 
-            print('Done processing ' + video_file_name + '\n\n')
+            print('\nDone processing ' + video_file_name + '\n\n')
