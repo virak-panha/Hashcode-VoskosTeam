@@ -1,6 +1,9 @@
 #   Hashcode 2017 qualification round youtube streaming problem solution by Team: Voskoi.
 #   This is a better version of our uploaded solution.
 #
+#   Original score: ~1M
+#   Extended round score: 1.77M
+#
 #   kittens Score:                          495538
 #   me_at_the_zoo Score:                    484699
 #   trending_today Score:                   335960
