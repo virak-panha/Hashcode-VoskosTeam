@@ -30,7 +30,7 @@ Instructions
 To run qualif2017.py
    python qualif2017.py filename' 'output'
 
-To run qualif2017.py
+To run qualif2018.py
    python qualif2018.py
 
 Dependencies: tqdm,numpy
