@@ -7,7 +7,7 @@ Extended round 2017 score:
      videos_worth_spreading Score:           462598
   Total Score:                           1,778,795
 
-Extended round 2017 score:
+Extended round 2018 score:
      a_example           10
      b_should_be_easy    176802
      c_no_hurry          14765689
