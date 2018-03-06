@@ -36,5 +36,5 @@ To run qualif2018.py
 Dependencies: tqdm,numpy
 
 
-In folder PatchedSolutions the optimal qualif17 round includes code (the cost function) from Stealth Phoenix team`s repo:
-https://github.com/plietar/hashcode2017.git
+In folder PatchedSolutions, the optimal qualif17 round contains the cost function of the Stealth Phoenix team.
+Their repo: https://github.com/plietar/hashcode2017.git
