@@ -33,7 +33,7 @@ To run qualif2017.py
 To run qualif2018.py
    python qualif2018.py
 
-Dependencies: tqdm,numpy
+Dependencies: tqdm,numpy (pip install tqdm).
 
 
 In folder PatchedSolutions, the optimal qualif17 round contains the cost function of the Stealth Phoenix team.
